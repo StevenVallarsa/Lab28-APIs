@@ -166,6 +166,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Search.cshtml" />
     <Content Include="Views\Home\MovieList.cshtml" />
+    <Content Include="Views\Home\GamePlay.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -96,13 +96,7 @@ namespace Lab28_APIs.Controllers
         //    return View(movies);
         //}
 
-        public ActionResult Draw()
-        {
-
-        }
-
-
-        public ActionResult Index()
+        public ActionResult GetDeck()
         {
             string shuffleDeck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
 
@@ -114,26 +108,100 @@ namespace Lab28_APIs.Controllers
             JToken jsonDeckID = JToken.Parse(APIText);
 
             string deckID = jsonDeckID["deck_id"].ToString();
+            Session["DeckID"] = deckID;
+            int numberOfCards = 5;
 
-            string initialDraw = $"https://deckofcardsapi.com/api/deck/{deckID}/draw/?count=5";
+            List<string> listOfCards = Draw(deckID, numberOfCards);
+            Session["Hand"] = listOfCards;
+        
 
-            request = WebRequest.CreateHttp(initialDraw);
-            response = (HttpWebResponse)request.GetResponse();
-            rd = new StreamReader(response.GetResponseStream());
-            APIText = rd.ReadToEnd();
+            return RedirectToAction("GamePlay");
+
+        }
+
+        public ActionResult GamePlay()
+        {
+            return View();
+        }
+
+        public List<string> Draw(string deckID, int numberOfCards)
+        {
+            string initialDraw = $"https://deckofcardsapi.com/api/deck/{deckID}/draw/?count={numberOfCards}";
+
+            HttpWebRequest request = WebRequest.CreateHttp(initialDraw);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader rd = new StreamReader(response.GetResponseStream());
+            string APIText = rd.ReadToEnd();
 
             JToken jsonCards = JToken.Parse(APIText);
 
             List<JToken> cardTokens = jsonCards["cards"].ToList();
             List<string> cardList = new List<string>();
 
-            foreach(JToken j in cardTokens)
+            foreach (JToken j in cardTokens)
             {
                 string card = j["image"].ToString();
                 cardList.Add(card);
             }
 
-            ViewBag.CardList = cardList;
+            return cardList;
+        }
+
+        public ActionResult NewCards(List<bool> cards)
+        {
+            int count = 0;
+            List<string> cardsList = (List<string>)Session["Hand"];
+            for(int i = 4; i > -1; i--)
+            {
+                if (cards[i] == true)
+                {
+                    cardsList.RemoveAt(i);
+                    count++;
+                }
+            }
+
+            string deckID = (string)Session["DeckID"];
+            List<string> addedCards = Draw(deckID, count);
+
+            cardsList.AddRange(addedCards);
+            Session["Hand"] = cardsList;
+
+            return RedirectToAction("GamePlay");
+        }
+
+
+        public ActionResult Index()
+        {
+            //string shuffleDeck = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
+
+            //HttpWebRequest request = WebRequest.CreateHttp(shuffleDeck);
+            //HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            //StreamReader rd = new StreamReader(response.GetResponseStream());
+            //string APIText = rd.ReadToEnd();
+
+            //JToken jsonDeckID = JToken.Parse(APIText);
+
+            //string deckID = jsonDeckID["deck_id"].ToString();
+
+            //string initialDraw = $"https://deckofcardsapi.com/api/deck/{deckID}/draw/?count=5";
+
+            //request = WebRequest.CreateHttp(initialDraw);
+            //response = (HttpWebResponse)request.GetResponse();
+            //rd = new StreamReader(response.GetResponseStream());
+            //APIText = rd.ReadToEnd();
+
+            //JToken jsonCards = JToken.Parse(APIText);
+
+            //List<JToken> cardTokens = jsonCards["cards"].ToList();
+            //List<string> cardList = new List<string>();
+
+            //foreach(JToken j in cardTokens)
+            //{
+            //    string card = j["image"].ToString();
+            //    cardList.Add(card);
+            //}
+
+            //ViewBag.CardList = cardList;
 
             return View();
 

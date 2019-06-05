@@ -1,0 +1,22 @@
+﻿<h1>Your Hand</h1>
+
+@{ List<string> cardList = (List<string>)Session["Hand"]; }
+@{ int count = 0;}
+
+@foreach (string card in cardList)
+{
+    <img src="@card" width="200" />
+
+}
+<form action="NewCards">
+    <table>
+        <tr>
+            <td width="200" align="center"><input type="checkbox" value="0" /></td>
+            <td width="200" align="center"><input type="checkbox" value="1" /></td>
+            <td width="200" align="center"><input type="checkbox" value="2" /></td>
+            <td width="200" align="center"><input type="checkbox" value="3" /></td>
+            <td width="200" align="center"><input type="checkbox" value="4" /></td>
+        </tr>
+    </table>
+    <input type="submit" value="Draw New Cards" />
+</form>
